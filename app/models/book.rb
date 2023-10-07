@@ -10,9 +10,11 @@ class Book < ApplicationRecord
   validates :name, length: { maximum: 25 }
   validates :price, numericality: { greater_than_or_equal_to: 0 }
   # 以下のカスタムのバリデーションがうまく機能していないが理由がよくわからない
-  validate do |book|
-    if book.name.include?("cat")
-      book.errors[:name] << "I love cat so much."
-    end
-  end
+  # validate do |book|
+  #   if book.name.include?("cat")
+  #     book.errors[:name] << "I love cat so much."
+  #   end
+  # end
+  # 以下のバリデーションはうまく機能している
+  validates :name, exclusion: { in: %w(cat), message: "I love cat so much." }
 end
