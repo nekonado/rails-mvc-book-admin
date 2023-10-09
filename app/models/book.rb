@@ -9,12 +9,20 @@ class Book < ApplicationRecord
   validates :name, presence: true
   validates :name, length: { maximum: 25 }
   validates :price, numericality: { greater_than_or_equal_to: 0 }
-  # 以下のカスタムのバリデーションがうまく機能していないが理由がよくわからない
-  # validate do |book|
-  #   if book.name.include?("cat")
-  #     book.errors[:name] << "I love cat so much."
-  #   end
-  # end
-  # 以下のバリデーションはうまく機能している
-  validates :name, exclusion: { in: %w(cat), message: "I love cat so much." }
+
+  before_validation do
+    self.name = self.name.gsub(/Cat/) do |matched|
+      "lovely #{matched}"
+    end
+  end
+
+  after_destroy(if: :high_price?) do
+    Rails.logger.warn "Book with high price is deleted: #{self.attributes}"
+    Rails.logger.warn "Please check!!"
+  end
+
+  def high_price?
+    price >= 5000
+  end
+
 end
